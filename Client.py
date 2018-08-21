@@ -6,8 +6,11 @@ def client():
     and if the server has taken to long to respond"""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     port = int(input("Enter a port number: "))
+    #port = 1500 #Uncommented for faster testing
     server = input("Enter an IP address: ")
-    pkttype = input("Enter a 'date' for the date and 'time' for the time: ")
+    #server = 'localhost' #Uncommented for faster testing
+    pkttype = input("Enter 'date' for the date and 'time' for the time: ")
+    #pkttype = 'time' #Uncommented for faster testing
     if port < 64000 and port > 1024:
         DtRequest = DtReqPkt(pkttype)
         s.settimeout(1)
@@ -50,8 +53,19 @@ def error_check(s):
             print("Length is incorrect, dicarding server response")
         else:
             print(dtpkt[13:].decode('utf-8'))
+            print("Magic number: " + hex(dtpkt[0]) + (hex(dtpkt[1]))[2:])
+            print("Packet Type: " + (hex(dtpkt[3]))[2:])
+            print("Language: " + (hex(dtpkt[5]))[2:])
+            year = str(bin(dtpkt[6])[2:] + bin(dtpkt[7])[2:])
+            print("Year:", int(year, 2))
+            print("Month:", int(bin(dtpkt[8]), 2))
+            print("Day:", int(bin(dtpkt[9]), 2))
+            print("Hour:", int(bin(dtpkt[10]), 2))
+            print("Minute:", int(bin(dtpkt[11]), 2))
+            print("Length of the Packet:", int(bin(dtpkt[12]), 2), "bytes")
     except:
         print("Invalid socket, the choosen port was not open on the server")
+        print("or some of the packet contents could not be displayed")
     
 def DtReqPkt(datapkt):
     """Creates the request packet to be sent to the server"""
